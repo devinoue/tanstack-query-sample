@@ -1,27 +1,24 @@
-import { useQuery, QueryFunctionContext } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useState } from 'react';
 
-type GetTodoContext = {
+type Props = {
   id: number;
 };
-
-const getTodos = async ({
-  queryKey,
-}: QueryFunctionContext<[string, GetTodoContext]>) => {
-  const ctx = queryKey[1];
-  const id = ctx.id;
+const getTodos = async ({ id }: Props) => {
   const res = await axios.get(
     `https://jsonplaceholder.typicode.com/todos/${id}`,
   );
   return res.data;
 };
 
-export default function Home() {
+export default function Pattern2() {
+  // Queries
+
   const [id, setId] = useState(1);
   const { data, isError, error, isLoading } = useQuery({
-    queryKey: ['todos', { id }],
-    queryFn: getTodos,
+    queryKey: ['todos', id],
+    queryFn: () => getTodos({ id }),
   });
 
   if (isLoading) return <>LOADING</>;
