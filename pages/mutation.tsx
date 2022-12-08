@@ -40,9 +40,21 @@ export default function Mutation() {
   const queryClient = useQueryClient();
 
   // Mutations
+  // 型引数はなくてもいい
+  // 型引数はTData、TError、TVariablesの順番、
+  // mutationFn: (variables: TVariables) => Promise<TData>の関係にある。
+  // なので、mutationFnは必ずreturnを忘れずに。Promise<void>であってもreturnがないとエラーになる
+  // 今回はややっこしいがリクエストとレスポンスが同じPutTodoRequestだが、もしレスポンスがない場合
+  // <void, Error, PutTodoRequest>になる。
   const mutation = useMutation<PutTodoRequest, Error, PutTodoRequest>({
-    mutationFn: () => putTodos({ id }),
+    mutationFn: (variables: PutTodoRequest) => {
+      // mutation.mutateからの値を確認する
+      console.log("mutation.mutateからの値")
+      console.log(variables)
+      return putTodos({ id: variables.id })
+    },
     onSuccess: (data) => {
+      console.log("レスポンスの値")
       console.log(data);
       // クエリをstale としてマークされる=古いと判断して再取得できるように
       // つまりまたgetTodoが動作する
@@ -77,8 +89,9 @@ export default function Mutation() {
         <button
           onClick={
             () => {
+              // この値はTVariablesは、mutationFnに送られる
               mutation.mutate({
-                id: 1,
+                id,
                 title: 'foo',
                 body: 'bar',
                 userId: 1,
